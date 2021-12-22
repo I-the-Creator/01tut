@@ -48,6 +48,8 @@ const Content = () => {
 
     return (
         <main>
+            {/* if items exist show the list */}
+            {items.length ? (
             <ul>
                 {items.map((item) => (  // iterate on items array
                     <li className="item" key={item.id}>
@@ -57,7 +59,7 @@ const Content = () => {
                             checked={item.checked}
                         />
                         <label
-                            style={(item.checked) ? { textDecoration: 'line-through'} : null}
+                            style={(item.checked) ? { textDecoration: 'line-through' } : null}
                             // to pass in the item.id the handleClick needs to be wrapped inside anonymous function
                             onDoubleClick={() =>handleCheck(item.id)}
                         >{item.item}</label>
@@ -71,6 +73,10 @@ const Content = () => {
 
                 ))}
             </ul>
+            ) : (
+                /* if the list is empty show the message */
+                <p style={{ marginTop: '2rem' }}>Your list is empty.</p>
+            )}
         </main>
     );
 };
