@@ -34,6 +34,18 @@ const Content = () => {
         localStorage.setItem('shoppinglist', JSON.stringify(listItems));
     }
 
+    const handleDelete = (id) => {
+        /*use filter method - it creates new filtered array 
+            filter out the items that have item.id == id,
+            other items added to new array = listItems
+        */
+        const listItems = items.filter((item) => item.id !== id);
+        // send new listItem array to state via setItems
+        setItems(listItems);
+        // save state value to localStorage
+        localStorage.setItem('shoppinglist', JSON.stringify(listItems));
+    }
+
     return (
         <main>
             <ul>
@@ -46,9 +58,12 @@ const Content = () => {
                         />
                         <label
                             style={(item.checked) ? { textDecoration: 'line-through'} : null}
+                            // to pass in the item.id the handleClick needs to be wrapped inside anonymous function
                             onDoubleClick={() =>handleCheck(item.id)}
                         >{item.item}</label>
                         <FaTrashAlt 
+                            // to pass in the item.id the handleDelete needs to be wrapped inside anonymous function
+                            onClick={() => handleDelete(item.id)}
                             role="button" 
                             tabIndex="0" 
                         />
