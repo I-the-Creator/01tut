@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import Content from './Content';
-import Header from './Header';
-import Footer from './Footer';
 
+import Header from './Header';
+import AddItem from './AddItem';
+import Content from './Content';
+import Footer from './Footer';
 
 function App() {
   
@@ -25,6 +26,30 @@ function App() {
     }
   ]);
 
+  const [newItem, setNewItem] = useState('');
+
+  const setAndSaveItems = (newItems) => {
+    // send new listItem array to state via setItems
+    setItems(newItems);
+    // save state value to localStorage
+    localStorage.setItem('shoppinglist', JSON.stringify(newItems));
+  }
+
+  const addItem = (item) => {
+
+    //item construction
+    /*  check the id and set the value for new item
+    if other items exist, get the last element id and increment it by 1, otherwise just set into 1 */
+    const id = items.length ? items[items.length - 1].id + 1 : 1;
+
+    const myNewItem = { id, checked: false, item };
+    // add new item into the array; create new array listItem - spread existing items and add new
+    const listItems = [...items, myNewItem];
+
+    // call the setAndSaveItems function and pass there array 'listItems' - updated after changes
+    setAndSaveItems(listItems);
+  }
+
   const handleCheck = (id) => {
     // console.log(`key: ${id}`);
     /* iterate on items and check if item.id === id that got from input then create new object
@@ -33,10 +58,9 @@ function App() {
     */
     const listItems = items.map((item) => item.id === id ? { ...item,
     checked: !item.checked } : item);
-    // send new listItem array to state via setItems
-    setItems(listItems);
-    // save state value to localStorage
-    localStorage.setItem('shoppinglist', JSON.stringify(listItems));
+
+    // call the setAndSaveItems function and pass there array 'listItems' - updated after changes
+    setAndSaveItems(listItems);
   }
 
   const handleDelete = (id) => {
@@ -45,10 +69,19 @@ function App() {
         other items added to new array = listItems
     */
     const listItems = items.filter((item) => item.id !== id);
-    // send new listItem array to state via setItems
-    setItems(listItems);
-    // save state value to localStorage
-    localStorage.setItem('shoppinglist', JSON.stringify(listItems));
+
+    // call the setAndSaveItems function and pass there array 'listItems' - updated after changes
+    setAndSaveItems(listItems);
+  }
+
+  const handleSubmit = (event) => {
+    // disable default behavior on submit (page reload, etc)
+    event.preventDefault();
+    if(!newItem) return;
+    // add Item - with newItem state as a parameter
+    addItem(newItem);
+    // reset state value after submit. it's deleting previous input
+    setNewItem('');
   }
   
   return (
@@ -56,6 +89,11 @@ function App() {
 
       {/* send the 'title' prop to Header - props drilling */}
       <Header title="Grocery List" />
+      <AddItem 
+        newItem={newItem}
+        setNewItem={setNewItem}
+        handleSubmit={handleSubmit}
+      />
        {/* send the 'items' and handler-functions props to Content - props drilling */}
       <Content 
         items={items}
