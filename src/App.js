@@ -88,7 +88,8 @@ function App() {
       />
        {/* send the 'items' and handler-functions props to Content - props drilling */}
       <Content 
-        items={items}
+      // add filtering by 'search input' value - with lowering case 
+        items={items.filter(item => ((item.item).toLowerCase()).includes(search.toLowerCase()))}
         handleCheck={handleCheck}
         handleDelete={handleDelete}
       />
