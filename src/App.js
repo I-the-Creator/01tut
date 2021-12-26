@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import Header from './Header';
 import AddItem from './AddItem';
+import SearchItem from './SearchItem';
 import Content from './Content';
 import Footer from './Footer';
 
@@ -11,6 +12,8 @@ function App() {
   const [items, setItems] = useState(JSON.parse(localStorage.getItem('shoppinglist')));
 
   const [newItem, setNewItem] = useState('');
+
+  const[search, setSearch] = useState('');
 
   const setAndSaveItems = (newItems) => {
     // send new listItem array to state via setItems
@@ -77,6 +80,11 @@ function App() {
         newItem={newItem}
         setNewItem={setNewItem}
         handleSubmit={handleSubmit}
+      />
+      {/* Search component - sending props to SearchItem*/}
+      <SearchItem 
+        search={search}
+        setSearch={setSearch}
       />
        {/* send the 'items' and handler-functions props to Content - props drilling */}
       <Content 
