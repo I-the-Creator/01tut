@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import Header from './Header';
 import AddItem from './AddItem';
@@ -9,18 +9,24 @@ import Footer from './Footer';
 function App() {
   
   // items state and default list values
-  const [items, setItems] = useState(JSON.parse(localStorage.getItem('shoppinglist')));
+
+ // set localstorgae value or empty array if local storage is empty, as default. 
+ // w/o it filter won't work as undefined will be sent into filter
+  const [items, setItems] = useState(JSON.parse(localStorage.getItem('shoppinglist')) || []); 
 
   const [newItem, setNewItem] = useState('');
 
   const[search, setSearch] = useState('');
 
-  const setAndSaveItems = (newItems) => {
-    // send new listItem array to state via setItems
-    setItems(newItems);
-    // save state value to localStorage
-    localStorage.setItem('shoppinglist', JSON.stringify(newItems));
-  }
+
+/*every time the component renders useEffect is running if it has no dependency, 
+  otherwise (with empty dep array) it starts only once immediately when the app loads, or if dependency array is not empty
+   - useEffect runs each time when data in this dependency changes.
+  useEffect runs after page is rendered - it's async function */
+  useEffect(() => {
+    localStorage.setItem('shoppinglist', JSON.stringify(items)); // save the data to localStorage each time the "items" changed
+  }, [items]);
+
 
   const addItem = (item) => {
 
@@ -33,8 +39,8 @@ function App() {
     // add new item into the array; create new array listItem - spread existing items and add new
     const listItems = [...items, myNewItem];
 
-    // call the setAndSaveItems function and pass there array 'listItems' - updated after changes
-    setAndSaveItems(listItems);
+    // call the setAItems and pass there array 'listItems' - updated after changes
+    setItems(listItems);
   }
 
   const handleCheck = (id) => {
@@ -46,8 +52,8 @@ function App() {
     const listItems = items.map((item) => item.id === id ? { ...item,
     checked: !item.checked } : item);
 
-    // call the setAndSaveItems function and pass there array 'listItems' - updated after changes
-    setAndSaveItems(listItems);
+      // call the setAItems and pass there array 'listItems' - updated after changes
+    setItems(listItems);
   }
 
   const handleDelete = (id) => {
@@ -57,8 +63,8 @@ function App() {
     */
     const listItems = items.filter((item) => item.id !== id);
 
-    // call the setAndSaveItems function and pass there array 'listItems' - updated after changes
-    setAndSaveItems(listItems);
+    // call the setAItems and pass there array 'listItems' - updated after changes
+    setItems(listItems);
   }
 
   const handleSubmit = (event) => {
@@ -89,7 +95,7 @@ function App() {
        {/* send the 'items' and handler-functions props to Content - props drilling */}
       <Content 
       // add filtering by 'search input' value - with lowering case 
-        items={items.filter(item => ((item.item).toLowerCase()).includes(search.toLowerCase()))}
+        items={items.filter(item => ((item.item).toLowerCase()).includes(search.toLowerCase()))}  // get the data from 'items' array
         handleCheck={handleCheck}
         handleDelete={handleDelete}
       />
