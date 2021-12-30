@@ -6,6 +6,9 @@ import SearchItem from './SearchItem';
 import Content from './Content';
 import Footer from './Footer';
 
+//API
+import apiRequest from './apiRequest';
+
 function App() {
 
   const API_URL = 'http://localhost:3500/items';
