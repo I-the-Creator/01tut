@@ -50,7 +50,7 @@ function App() {
 
       } catch (err) {  // catch the error and set the fetchError state - and show it before 'Content' part in <main>
           setFetchError(err.message);
-      } finally {  // after loading complete with or without error set the isLoading state to false
+      } finally {  // after loading complete, with or without error, set the isLoading state to false
         setIsLoading(false);
       }
     }
