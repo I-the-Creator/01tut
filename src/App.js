@@ -7,25 +7,62 @@ import Content from './Content';
 import Footer from './Footer';
 
 function App() {
-  
+
+  const API_URL = 'http://localhost:3500/items';
+
   // items state and default list values
 
- // set localstorgae value or empty array if local storage is empty, as default. 
- // w/o it filter won't work as undefined will be sent into filter
-  const [items, setItems] = useState(JSON.parse(localStorage.getItem('shoppinglist')) || []); 
-
+/*  set localstorgae value or empty array if local storage is empty, as default. 
+    w/o it filter won't work as undefined will be sent into filter */
+  // const [items, setItems] = useState(JSON.parse(localStorage.getItem('shoppinglist')) || []); 
+  const [items, setItems] = useState([]);
+  
   const [newItem, setNewItem] = useState('');
 
-  const[search, setSearch] = useState('');
+  const [search, setSearch] = useState('');
+
+  const [fetchError, setFetchError] = useState(null);
+
+  const [isLoading, setIsLoading] = useState(true);  // state to control process of Loading data from server and showing Content
 
 
 /*every time the component renders useEffect is running if it has no dependency, 
   otherwise (with empty dep array) it starts only once immediately when the app loads, or if dependency array is not empty
    - useEffect runs each time when data in this dependency changes.
   useEffect runs after page is rendered - it's async function */
+  // useEffect(() => {
+  //   localStorage.setItem('shoppinglist', JSON.stringify(items)); // save the data to localStorage each time the "items" changed
+  // }, [items]);
+
   useEffect(() => {
-    localStorage.setItem('shoppinglist', JSON.stringify(items)); // save the data to localStorage each time the "items" changed
-  }, [items]);
+
+    const fetchItems = async () => {   // function called into action once on application start, as dependency array is empty
+      try {
+        const response = await fetch(API_URL);
+
+        /* normally response errors wouldn't be caught by catch function,
+        to workaround it use 'throw Error' in case of response issue and it will be caught*/
+        if(!response.ok) throw Error('Did not receive expected data'); 
+
+        const listItems = await response.json();
+        setItems(listItems);
+        setFetchError(null);  // reset fetchError after successful request, as previously we might have had error
+
+      } catch (err) {  // catch the error and set the fetchError state - and show it before 'Content' part in <main>
+          setFetchError(err.message);
+      } finally {  // after loading complete with or without error set the isLoading state to false
+        setIsLoading(false);
+      }
+    }
+
+    // to emulate server request delay
+    setTimeout(() => {  
+      fetchItems();  // as fetchItems() does not return a value we can just call it w/o IIFE
+      // (async () => await fetchItems())();  
+    }, 2000)
+
+  }, [])
+
 
 
   const addItem = (item) => {
@@ -92,13 +129,22 @@ function App() {
         search={search}
         setSearch={setSearch}
       />
-       {/* send the 'items' and handler-functions props to Content - props drilling */}
-      <Content 
-      // add filtering by 'search input' value - with lowering case 
-        items={items.filter(item => ((item.item).toLowerCase()).includes(search.toLowerCase()))}  // get the data from 'items' array
-        handleCheck={handleCheck}
-        handleDelete={handleDelete}
-      />
+      <main>
+        {/* short-circuit:  if isLoading is true show the message in <p> */}
+        {isLoading && <p>Loading Items...</p>}
+
+        {/* short-circuit:  if fetchError exist put the right part of the expression into <main> */}
+        {fetchError && <p style={{color: "red"}}>{`Error: ${fetchError}`}</p>}
+
+        {/* send the 'items' and handler-functions props to Content - props drilling */}
+        {/* short-circuit: if there is no fetchError and isLoading is 'false' - 'Content' will be shown */}
+        {!fetchError && !isLoading && <Content 
+        // add filtering by 'search input' value - with lowering case 
+          items={items.filter(item => ((item.item).toLowerCase()).includes(search.toLowerCase()))}  // get the data from 'items' array
+          handleCheck={handleCheck}
+          handleDelete={handleDelete}
+        />}
+      </main>
       <Footer 
         length={items.length}
       />
