@@ -8,7 +8,7 @@ const apiRequest = async (url = '', optionsObj = null, errMsg = null) => {
         errMsg = err.message;
     } finally {
         // whether or not we have errMsg - null(default) or some value
-        return errMsg;
+        return errMsg;   // all it returns is the errMsg - nothing more
     }
 }
 

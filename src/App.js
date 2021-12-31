@@ -67,8 +67,7 @@ function App() {
   }, [])
 
 
-
-  const addItem = (item) => {
+  const addItem = async (item) => {  // async as apiRequest functions in async as well
 
     //item construction
     /*  check the id and set the value for new item
@@ -81,12 +80,24 @@ function App() {
 
     // call the setAItems and pass there array 'listItems' - updated after changes
     setItems(listItems);
+
+    // apiRequest options for create(POST) request
+    const postOptions = {
+      method : 'POST',
+      headers : {
+        'Content-Type' : 'application/json'
+      },
+      body : JSON.stringify(myNewItem)  // send new item to server
+    }
+    //send a request and handle it's result
+    const result = await apiRequest(API_URL, postOptions); // apiRequest returns only errMsg if it's exist
+    if(result) setFetchError(result);  // if errMsg exist set the fetchError state with 'result' value
   }
 
-  const handleCheck = (id) => {
+  const handleCheck = async (id) => {
     // console.log(`key: ${id}`);
-    /* iterate on items and check if item.id === id that got from input then create new object
-    equal to original (using spread operator) and flip the current checked property value (!item.checked),
+    /* iterate on items and check if item.id === id that got from input, then create new object
+    equal to original (using spread operator) and flip the current 'checked' property value (!item.checked),
     otherwise return the current 'item' w/o changes
     */
     const listItems = items.map((item) => item.id === id ? { ...item,
@@ -94,6 +105,24 @@ function App() {
 
       // call the setAItems and pass there array 'listItems' - updated after changes
     setItems(listItems);
+
+    // get the item that is checked - define it by filtering listItems array by 'id' value
+    const myItem = listItems.filter((item) => item.id === id);
+
+    // apiRequest options for update(PATCH) request - send only 'checked' property of this specific item
+     const updateOptions = {
+      method : 'PATCH',
+      headers : {
+        'Content-Type' : 'application/json',
+      },
+        // as filter returns an array, with one item in this case, we should referring to this item by its key [0]
+      body : JSON.stringify({ checked : myItem[0].checked})
+     }
+     // define a request URL as it's a differ from GET and POST URL
+     const reqUrl = `${API_URL}/${id}`;
+     //send a request and handle it's result
+     const result = await apiRequest(reqUrl, updateOptions);  // apiRequest returns only errMsg if it's exist
+     if(result) setFetchError(result);   // if errMsg exist set the fetchError state with 'result' value
   }
 
   const handleDelete = (id) => {
@@ -111,7 +140,7 @@ function App() {
     // disable default behavior on submit (page reload, etc)
     event.preventDefault();
     if(!newItem) return;
-    // add Item - with newItem state as a parameter
+    // add Item - with newItem state as a parameter - got fro controlled input in AddItem.jsx
     addItem(newItem);
     // reset state value after submit. it's deleting previous input
     setNewItem('');
