@@ -13,11 +13,10 @@ function App() {
 
   const API_URL = 'http://localhost:3500/items';
 
-  // items state and default list values
 
-/*  set localstorgae value or empty array if local storage is empty, as default. 
+/*  set localStorage value or empty array if local storage is empty, as default. 
     w/o it filter won't work as undefined will be sent into filter */
-  // const [items, setItems] = useState(JSON.parse(localStorage.getItem('shoppinglist')) || []); 
+  //! const [items, setItems] = useState(JSON.parse(localStorage.getItem('shoppinglist')) || []); // use with localStorage w/o server
   const [items, setItems] = useState([]);
   
   const [newItem, setNewItem] = useState('');
@@ -28,17 +27,18 @@ function App() {
 
   const [isLoading, setIsLoading] = useState(true);  // state to control process of Loading data from server and showing Content
 
-
+// !GET REQUEST
 /*every time the component renders useEffect is running if it has no dependency, 
   otherwise (with empty dep array) it starts only once immediately when the app loads, or if dependency array is not empty
    - useEffect runs each time when data in this dependency changes.
   useEffect runs after page is rendered - it's async function */
-  // useEffect(() => {
-  //   localStorage.setItem('shoppinglist', JSON.stringify(items)); // save the data to localStorage each time the "items" changed
-  // }, [items]);
+
+  //! Store the entered data to localStorage - alternative storage if server is not working
+  useEffect(() => {
+    localStorage.setItem('shoppinglist', JSON.stringify(items)); // save the data to localStorage each time the "items" changed
+  }, [items]);
 
   useEffect(() => {
-
     const fetchItems = async () => {   // function called into action once on application start, as dependency array is empty
       try {
         const response = await fetch(API_URL);
@@ -57,16 +57,15 @@ function App() {
         setIsLoading(false);
       }
     }
-
     // to emulate server request delay
     setTimeout(() => {  
       fetchItems();  // as fetchItems() does not return a value we can just call it w/o IIFE
       // (async () => await fetchItems())();  
-    }, 2000)
-
+    }, 1500)
   }, [])
 
 
+  //! POST REQUEST
   const addItem = async (item) => {  // async as apiRequest functions in async as well
 
     //item construction
@@ -94,7 +93,9 @@ function App() {
     if(result) setFetchError(result);  // if errMsg exist set the fetchError state with 'result' value
   }
 
-  const handleCheck = async (id) => {
+
+  //! PATCH REQUEST
+  const handleCheck = async (id) => {  
     // console.log(`key: ${id}`);
     /* iterate on items and check if item.id === id that got from input, then create new object
     equal to original (using spread operator) and flip the current 'checked' property value (!item.checked),
@@ -125,7 +126,9 @@ function App() {
      if(result) setFetchError(result);   // if errMsg exist set the fetchError state with 'result' value
   }
 
-  const handleDelete = (id) => {
+
+  //! DELETE REQUEST
+  const handleDelete = async (id) => {
     /*use filter method - it creates new filtered array 
         filter out the items that have item.id == id,
         other items added to new array = listItems
@@ -134,6 +137,12 @@ function App() {
 
     // call the setAItems and pass there array 'listItems' - updated after changes
     setItems(listItems);
+
+    const deleteOptions = { method : 'DELETE' };
+    const reqUrl = `${API_URL}/${id}`;
+    //send a request and handle it's result
+    const result = await apiRequest(reqUrl, deleteOptions);  // apiRequest returns only errMsg if it's exist
+    if(result) setFetchError(result);   // if errMsg exist set the fetchError state with 'result' value
   }
 
   const handleSubmit = (event) => {
