@@ -1,19 +1,44 @@
 {
-    "items": [
-        {
-            "id": 1,
-            "checked": false,
-            "item": "Almonds, Unsalted, in the blue bag"
-        },
-        {
-            "id": 2,
-            "checked": false,
-            "item": "Pizza"
-        },
-        {
-            "id": 3,
-            "checked": false,
-            "item": "Bread"
-        }
-    ]
+  "items": [
+    {
+      "id": 1,
+      "checked": false,
+      "item": "Almonds, Unsalted, in the blue bag"
+    },
+    {
+      "id": 3,
+      "checked": false,
+      "item": "Bread"
+    },
+    {
+      "id": 4,
+      "checked": false,
+      "item": "Cookies"
+    },
+    {
+      "id": 5,
+      "checked": false,
+      "item": "Candies"
+    },
+    {
+      "id": 7,
+      "checked": false,
+      "item": "Масло"
+    },
+    {
+      "id": 8,
+      "checked": false,
+      "item": "Коробки"
+    },
+    {
+      "id": 9,
+      "checked": false,
+      "item": "хлеб белый"
+    },
+    {
+      "id": 10,
+      "checked": false,
+      "item": "хлеб черный"
+    }
+  ]
 }
